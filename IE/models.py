@@ -5,6 +5,7 @@ from django.contrib import admin
 from IE.simplex2 import SimplexSolver
 from scipy.optimize import linprog
 
+
 class Indicators(models.Model):
     parent = models.ForeignKey('self', blank=True, null=True, related_name='children', on_delete=models.SET_NULL)
     name = models.TextField()
@@ -38,37 +39,20 @@ class Indicators(models.Model):
             max_calc.append(max_)
             min_calc.append(min_)
 
+            if not (max[item.id]):
+                max[item.id] = 0
             max_weight.append(float(max[item.id]))
+            if not (min[item.id]):
+                min[item.id] = 0
             min_weight.append(float(min[item.id]))
             max_restriction.append(1)
-            # max_calc.append()
 
-        # tab = Tableau(max_line)
-        # tab.add_constraint(max_restriction, 1)
-        # # print(max_weight)
-        # # print(min_calc)
-        # for (i, v) in enumerate(max_calc):
-        #     tab.add_constraint(v, max_weight[i])
-        # for (i, v) in enumerate(min_calc):
-        #     tab.add_constraint(v, max_weight[i])
-        #     tab.add_constraint(v, 0)
-        # tab.solve()
-        # print('done')
-        # tab.display()
         A = [max_restriction] + max_calc + min_calc + max_calc
         b = [1] + max_weight + min_weight + [0, 0, 0]
-        # tab = SimplexSolver().run_simplex(A=A, b=b, c=max_line, prob='max',
-        #                                   ineq=['=', '<=', '<=', '<=', '>=', '>=', '>=', '>=', '>=', '>='],
-        #                                   enable_msg=False, latex=False)
-        # SimplexSolver().final_solution_doc()
-        # print(A)
-        # print(b)
-        # print(max_line)
-        res = linprog(c=max_line, A_ub=A, b_ub=b, bounds=(0, None))
-        print('Optimal value:', res.fun, '\nX:', res.x)
-        # tab.
-
-        return 1
+        tab = SimplexSolver().run_simplex(A=A, b=b, c=max_line, prob='max',
+                                          ineq=['=', '<=', '<=', '<=', '>=', '>=', '>=', '>=', '>=', '>='],
+                                          enable_msg=False, latex=False)
+        return tab
 
 
 class IndicatorsAdmin(admin.ModelAdmin):
