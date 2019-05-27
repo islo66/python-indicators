@@ -1,0 +1,71 @@
+{% extends 'base.html' %}
+{% block content %}
+    <form action="/" method="post" class="form-row">
+        <div class="row">
+            <div class="col">
+                <label for="region">Alege Regiunea</label>
+            </div>
+            <div class="col">
+                <select name="region" id="region">
+                    {% for region in regions %}
+                        <option value="{{ region.id }}">{{ region.name }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col">
+                <label for="year">An</label>
+            </div>
+            <div class="col">
+                <select name="year" id="year">
+                    {% for weight_indicator in weight_indicators %}
+                        <option value="{{ weight_indicator.year }}">{{ weight_indicator.year }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+
+        </div>
+        <div class="row">
+            <div class="col">
+                <label for="indicator">Indicator</label>
+            </div>
+            <div class="col">
+                <select name="indicator" id="indicator">
+                    {% for parent_indicator in parent_indicators %}
+                        <option value="{{ parent_indicator.id }}">{{ parent_indicator.name }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+
+        </div>
+
+        {% for parent_indicator in parent_indicators %}
+            <div class="row">
+                <div class="col">
+                    <label for="min">Intervalul minim pentru {{ parent_indicator.name }}</label>
+                </div>
+
+                <div class="col">
+                    <input type="text" name="min[{{ parent_indicator.id }}]">
+                </div>
+            </div>
+            <div class="row">
+                <div class="col">
+
+                    <label for="max">Intervalul maxim pentru {{ parent_indicator.name }}</label>
+                </div>
+                <div class="col">
+
+                    <input type="text" name="max[{{ parent_indicator.id }}]">
+                </div>
+            </div>
+        {% endfor %}
+
+        <div class="row">
+            <button type="submit">Calculeaza</button>
+        </div>
+
+
+    </form>
+{% endblock %}
