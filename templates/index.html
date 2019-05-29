@@ -1,5 +1,6 @@
 {% extends 'base.html' %}
 {% block content %}
+    <H1>Metoda Simplex</H1>
     <form action="/" method="post" class="form-row">
         <div class="row">
             <div class="col">
@@ -26,20 +27,6 @@
             </div>
 
         </div>
-        <div class="row">
-            <div class="col">
-                <label for="indicator">Indicator</label>
-            </div>
-            <div class="col">
-                <select name="indicator" id="indicator">
-                    {% for parent_indicator in parent_indicators %}
-                        <option value="{{ parent_indicator.id }}">{{ parent_indicator.name }}</option>
-                    {% endfor %}
-                </select>
-            </div>
-
-        </div>
-
         {% for parent_indicator in parent_indicators %}
             <div class="row">
                 <div class="col">

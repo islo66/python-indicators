@@ -1,3 +1,5 @@
+import random
+
 from django.db import models
 from django.contrib import admin
 
@@ -13,7 +15,7 @@ class Indicators(models.Model):
     def __str__(self):
         return self.name
 
-    def calculate_indicators_weight(self, year, region, max, min):
+    def calculate_indicators_weight(self, year, region, min, max):
         indicators = self.objects.filter(parent=None).all()
         max_line = []
         max_restriction = []
@@ -52,7 +54,37 @@ class Indicators(models.Model):
         tab = SimplexSolver().run_simplex(A=A, b=b, c=max_line, prob='max',
                                           ineq=['=', '<=', '<=', '<=', '>=', '>=', '>=', '>=', '>=', '>='],
                                           enable_msg=False, latex=False)
+        print(tab)
         return tab
+
+    def monte_carlo(self, year, region, min, max, weight_indicators):
+        # IC= alphaIE + betaIS + gamaIT
+
+        result = {}
+        for ind in weight_indicators:
+            val = 0
+            for i in range(1, 10):
+                val += random.randrange(float(min[ind.indicator_id]) * 100, float(max[ind.indicator_id]) * 100)
+            result[ind.indicator_id] = val / 1000
+            print(val / 1000, ind.indicator.name, ind.weight)
+        wi_parent = WeightIndicators.objects.filter(region_id=region, year=year,
+                                                    indicator_id__in=self.objects.filter(
+                                                        parent__isnull=True).values_list(
+                                                        'id', flat=True)).all()
+        IC = 0
+        for wi_p in wi_parent:
+            childrens = self.objects.filter(parent_id=wi_p.indicator_id).all()
+            value = 0
+            for child in childrens:
+                wi_child = WeightIndicators.objects.filter(indicator_id=child.id, year=year, region_id=region).first()
+                if (wi_child):
+                    if (result.get(wi_child.indicator_id)):
+                        value += wi_child.weight * result.get(wi_child.indicator_id)
+                    else:
+                        value += wi_child.weight * wi_child.value
+            IC += wi_p.weight * value
+
+        return IC
 
 
 class IndicatorsAdmin(admin.ModelAdmin):
@@ -79,4 +111,4 @@ class WeightIndicators(models.Model):
 
 
 class WeightIndicatorsAdmin(admin.ModelAdmin):
-    list_display = ('value', 'weight', 'region', 'indicator')
+    list_display = ('value', 'weight', 'region', 'indicator', 'year')

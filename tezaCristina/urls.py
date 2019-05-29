@@ -15,11 +15,12 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path
-from IE.views import index
+from IE.views import index, methodTwo
 
 admin.autodiscover()
 
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('', index),
+    path('method-two', methodTwo),
 ]

@@ -1,0 +1,80 @@
+{% extends 'base.html' %}
+{% block content %}
+    <H1>Metoda Monte-Carlo</H1>
+    <form action="" method="post" class="form-row">
+        {% if step == 1 %}
+            <div class="row">
+                <div class="col">
+                    <label for="region">Alege Regiunea</label>
+                </div>
+                <div class="col">
+                    <select name="region" id="region">
+                        {% for region in regions %}
+                            <option value="{{ region.id }}">{{ region.name }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col">
+                    <label for="year">An</label>
+                </div>
+                <div class="col">
+                    <select name="year" id="year">
+                        {% for year in years %}
+                            <option value="{{ year }}">{{ year }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+            </div>
+            {% for parent_indicator in parent_indicators %}
+                <div class="row">
+                    <div class="col">
+                        <label for="min">Intervalul minim pentru {{ parent_indicator.name }}</label>
+                    </div>
+
+                    <div class="col">
+                        <input type="text" name="min[{{ parent_indicator.id }}]">
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col">
+
+                        <label for="max">Intervalul maxim pentru {{ parent_indicator.name }}</label>
+                    </div>
+                    <div class="col">
+
+                        <input type="text" name="max[{{ parent_indicator.id }}]">
+                    </div>
+                </div>
+            {% endfor %}
+        {% endif %}
+        {% if step == 2 %}
+            <input type="hidden" name="step" value="3">
+            <input type="hidden" name="region" value="{{ region.id }}">
+            <input type="hidden" name="year" value="{{ year_input }}">
+            <div class="row">Regiune: {{ region.name }} si anul: {{ year_input }}</div>
+            <div class="row">
+                Introdu valoarea minima si maxima pentru urmatorii indicatori
+            </div>
+            {% for ind in weight_indicators %}
+                <div class="row">
+                    <div class="col">
+                        <label>{{ ind.indicator.name }}</label>
+                    </div>
+                    <div class="col">
+                        <input type="text" name="min[{{ ind.indicator_id }}]">
+                        <input type="text" name="max[{{ ind.indicator_id }}]">
+                    </div>
+                </div>
+            {% endfor %}
+        {% endif %}
+        {% if step == 3 %}
+            IC optimal neliniar este = {{ IC }}
+        {% else %}
+            <div class="row">
+                <button type="submit">Calculeaza</button>
+            </div>
+        {% endif %}
+    </form>
+{% endblock %}
