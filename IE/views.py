@@ -9,18 +9,22 @@ def index(request):
     regions = Regions.objects.all()
     weight_indicators = WeightIndicators.get_distinct_years(WeightIndicators)
     parent_indicators = Indicators.objects.filter(parent=None).all()
-
+    response = {'x1': 0, 'x2': 0, 'x3': 0}
+    region = ''
+    region_model = {}
     if (request.method == 'POST'):
         year = request.POST.get('year')
         region = request.POST.get('region')
+        region_model = Regions.objects.get(pk=region)
         min = {}
         max = {}
         for parent_indicator in parent_indicators:
             min[parent_indicator.id] = request.POST.get('min[' + str(parent_indicator.id) + ']')
             max[parent_indicator.id] = request.POST.get('max[' + str(parent_indicator.id) + ']')
-        Indicators.calculate_indicators_weight(Indicators, year, region, min, max)
+        response = Indicators.calculate_indicators_weight(Indicators, year, region, min, max)
     return render(request, 'index.html',
-                  {'regions': regions, 'weight_indicators': weight_indicators, 'parent_indicators': parent_indicators})
+                  {'regions': regions, 'weight_indicators': weight_indicators, 'parent_indicators': parent_indicators,
+                   'response': response, 'hasResponse': request.method == 'POST', 'region': region_model})
 
 
 @csrf_exempt
@@ -49,5 +53,5 @@ def methodTwo(request):
             IC = Indicators.monte_carlo(Indicators, year, region, min, max, weight_indicators)
             return render(request, 'method-two.html',
                           {'years': range(1999, 2050), 'regions': regions, 'step': int(step),
-                           'region': Regions.objects.get(pk=region), 'year_input': year, 'IC':IC})
+                           'region': Regions.objects.get(pk=region), 'year_input': year, 'IC': IC})
     return render(request, 'method-two.html', {'years': range(1999, 2050), 'regions': regions, 'step': step})

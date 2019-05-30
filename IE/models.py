@@ -49,13 +49,16 @@ class Indicators(models.Model):
             min_weight.append(float(min[item.id]))
             max_restriction.append(1)
 
-        A = [max_restriction] + max_calc + min_calc + max_calc
-        b = [1] + max_weight + min_weight + [0, 0, 0]
+        A = [max_restriction] + max_calc + min_calc #+ max_calc
+        b = [1] + max_weight + min_weight #+ [0, 0, 0]
+        print(A)
+        print(b)
+        print(max_line)
         tab = SimplexSolver().run_simplex(A=A, b=b, c=max_line, prob='max',
-                                          ineq=['=', '<=', '<=', '<=', '>=', '>=', '>=', '>=', '>=', '>='],
+                                          ineq=['=', '<=', '<=', '<=', '>=', '>=', '>='],
                                           enable_msg=False, latex=False)
         print(tab)
-        return tab
+        return {'x1': float(tab.get('x_1')), 'x2': float(tab.get('x_2')), 'x3': float(tab.get('x_3'))}
 
     def monte_carlo(self, year, region, min, max, weight_indicators):
         # IC= alphaIE + betaIS + gamaIT
